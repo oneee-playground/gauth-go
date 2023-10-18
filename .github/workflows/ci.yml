@@ -1,0 +1,34 @@
+name: CI
+
+on:
+    pull_request:
+        branches: ["main"]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        environment: test
+        env:
+            CLIENT_ID: ${{ vars.CLIENT_ID }}
+            CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+            REDIRECT_URI: ${{ vars.REDIRECT_URI }}
+            EMAIL: ${{ vars.EMAIL }}
+            PASSWORD: ${{ secrets.PASSWORD }}
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Set up Go
+              uses: actions/setup-go@v4
+              with:
+                  go-version: "1.21"
+
+            - name: Build
+              run: go build -v ./...
+
+            - name: Test with coverage
+              run: go test -race -coverprofile=coverage.txt -covermode=atomic
+
+            - name: Upload coverage reports to Codecov
+              uses: codecov/codecov-action@v3
+              env:
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
