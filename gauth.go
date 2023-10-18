@@ -178,8 +178,14 @@ func (c *Client) do(request *http.Request) (body io.ReadCloser, err error) {
 	}
 
 	if res.StatusCode >= 400 {
-		res.Body.Close()
-		return nil, newGauthErr(res.StatusCode)
+		defer res.Body.Close()
+
+		b, err := io.ReadAll(res.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, newGauthErr(res.StatusCode, string(b))
 	}
 
 	return res.Body, nil
