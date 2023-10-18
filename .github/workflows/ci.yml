@@ -8,6 +8,12 @@ jobs:
     build:
         runs-on: ubuntu-latest
         environment: test
+        env:
+            CLIENT_ID: ${{ vars.CLIENT_ID }}
+            CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+            REDIRECT_URI: ${{ vars.REDIRECT_URI }}
+            EMAIL: ${{ vars.EMAIL }}
+            PASSWORD: ${{ secrets.PASSWORD }}
         steps:
             - uses: actions/checkout@v3
 
