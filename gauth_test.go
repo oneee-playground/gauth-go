@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/onee-only/gauth-go"
+	"github.com/oneee-playground/gauth-go"
 )
 
 func TestGAuth(t *testing.T) {
