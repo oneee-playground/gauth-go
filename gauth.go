@@ -3,7 +3,6 @@ package gauth
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -56,7 +55,6 @@ func NewDefaultClient(opts ClientOpts) *Client {
 
 // IssueCode retrieves code with given email and password
 func (c *Client) IssueCode(email, password string) (code string, err error) {
-
 	data, err := toJSON(issueCodeRequest{
 		Email:    email,
 		Password: password,
@@ -65,12 +63,12 @@ func (c *Client) IssueCode(email, password string) (code string, err error) {
 		return "", err
 	}
 
-	r, err := http.NewRequest("POST", fmt.Sprint(AuthURL, "/oauth/code"), data)
+	req, err := http.NewRequest(http.MethodPost, AuthURL+"/oauth/code", data)
 	if err != nil {
 		return "", err
 	}
 
-	body, err := c.do(r)
+	body, err := c.do(req)
 	if err != nil {
 		return "", err
 	}
@@ -87,7 +85,6 @@ func (c *Client) IssueCode(email, password string) (code string, err error) {
 
 // IssueToken retrieves access & refresh token with given code
 func (c *Client) IssueToken(code string) (access, refresh string, err error) {
-
 	data, err := toJSON(issueTokenRequest{
 		Code:         code,
 		ClientID:     c.clientID,
@@ -99,12 +96,12 @@ func (c *Client) IssueToken(code string) (access, refresh string, err error) {
 		return "", "", err
 	}
 
-	r, err := http.NewRequest("POST", fmt.Sprint(AuthURL, "/oauth/token"), data)
+	req, err := http.NewRequest(http.MethodPost, AuthURL+"/oauth/token", data)
 	if err != nil {
 		return "", "", err
 	}
 
-	body, err := c.do(r)
+	body, err := c.do(req)
 	if err != nil {
 		return "", "", err
 	}
@@ -121,15 +118,14 @@ func (c *Client) IssueToken(code string) (access, refresh string, err error) {
 
 // ReIssueToken retrieves access & refresh token with given refresh token
 func (c *Client) ReIssueToken(refreshToken string) (access, refresh string, err error) {
-
-	r, err := http.NewRequest("PATCH", fmt.Sprint(AuthURL, "/oauth/token"), nil)
+	req, err := http.NewRequest(http.MethodPatch, AuthURL+"/oauth/token", nil)
 	if err != nil {
 		return "", "", err
 	}
 
-	r.Header.Set("refreshToken", fmt.Sprintf("Bearer %s", refreshToken))
+	req.Header.Set("refreshToken", "Bearer "+refreshToken)
 
-	body, err := c.do(r)
+	body, err := c.do(req)
 	if err != nil {
 		return "", "", err
 	}
@@ -146,15 +142,14 @@ func (c *Client) ReIssueToken(refreshToken string) (access, refresh string, err 
 
 // GetUserInfo retrieves userInfo with given access token
 func (c *Client) GetUserInfo(accessToken string) (info UserInfo, err error) {
-
-	r, err := http.NewRequest("GET", fmt.Sprint(ResourceURL, "/user"), nil)
+	req, err := http.NewRequest(http.MethodGet, ResourceURL+"/user", nil)
 	if err != nil {
 		return UserInfo{}, err
 	}
 
-	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
+	req.Header.Set("Authorization", "Bearer "+accessToken)
 
-	body, err := c.do(r)
+	body, err := c.do(req)
 	if err != nil {
 		return UserInfo{}, err
 	}
@@ -170,7 +165,6 @@ func (c *Client) GetUserInfo(accessToken string) (info UserInfo, err error) {
 }
 
 func (c *Client) do(request *http.Request) (body io.ReadCloser, err error) {
-
 	request.Header.Set("Content-Type", "application/json")
 	res, err := c.httpClient.Do(request)
 	if err != nil {
