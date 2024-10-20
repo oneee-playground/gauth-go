@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	AuthURL     = "https://server.gauth.co.kr"
-	ResourceURL = "https://open.gauth.co.kr"
+	AuthURL     = "https://server-gauth.msg-team.com"
+	ResourceURL = "https://resource-gauth.msg-team.com"
 )
 
 const (
